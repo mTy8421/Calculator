@@ -9,3 +9,13 @@ body{
     background-color: #fba;
     background-image: linear-gradient(62deg, #fba 0%, #f7c 100%);
 }
+
+.calc{
+    padding: 20px;
+    border-radius: 1em;
+    height: 500px;
+    width: 400px;
+    margin: auto;
+    background-color: palevioletred;
+    box-shadow: 10px 10px 20px rgba(0 , 0, 0, 0.637);
+}
