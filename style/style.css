@@ -45,3 +45,10 @@ body{
     font-size: 30px;
     cursor: pointer;
 }
+
+.button:active{
+    background-color: rgba(0, 0, 0, 0.568);
+    -webkit-box-shadow: inset 0px 0px 5px #c1c1c1;
+    -moz-box-shadow: inset 0px 0px  5px #d32626;
+    box-shadow: inset 0px 0px 5px #c1c1c1;
+}
