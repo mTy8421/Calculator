@@ -31,3 +31,17 @@ body{
     outline: none;
     font-size: 22px;
 }
+
+.button{
+    font-family: 'Orbitron', sans-serif;
+    background-color: black;
+    color: white;
+    border: solid black 0.5px;
+    width: 80%;
+    border-radius: 5px;
+    height: 60%;
+    outline: none;
+    border: none;
+    font-size: 30px;
+    cursor: pointer;
+}
