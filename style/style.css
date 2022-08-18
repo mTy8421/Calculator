@@ -6,8 +6,8 @@ body{
     justify-content: center;
     overflow-x: hidden;
     flex-direction: column;
-    background-color: #fba;
-    background-image: linear-gradient(62deg, #fba 0%, #f7c 100%);
+    background-color: #fbab7e;
+    background-image: linear-gradient(62deg, #fbab7e 0%, #f7ce68 100%);
 }
 
 .calc{
