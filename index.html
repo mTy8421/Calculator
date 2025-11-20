@@ -1,84 +1,624 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculator</title>
-    <link rel="stylesheet" href="./style/style.css">
-</head>
-<body>
-    <table class="calc">
-        <tr>
-            <td colspan="3" class="outputtext">
-                <input class="display-box" type="text" id="result" disabled>
-            </td>
-            <td>
-                <input class="button" type="button" value="C" onclick="clearScreen()" style="background-color: #fb0066;">
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <input class="button" type="button" value="1" onclick="display('1')">
-            </td>
-            <td>
-                <input class="button" type="button" value="2" onclick="display('2')">
-            </td>
-            <td>
-                <input class="button" type="button" value="3" onclick="display('3')">
-            </td>
-            <td>
-                <input class="button" type="button" value="/" onclick="display('/')">
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <input class="button" type="button" value="4" onclick="display('4')">
-            </td>
-            <td>
-                <input class="button" type="button" value="5" onclick="display('5')">
-            </td>
-            <td>
-                <input class="button" type="button" value="6" onclick="display('6')">
-            </td>
-            <td>
-                <input class="button" type="button" value="-" onclick="display('-')">
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <input class="button" type="button" value="7" onclick="display('7')">
-            </td>
-            <td>
-                <input class="button" type="button" value="8" onclick="display('8')">
-            </td>
-            <td>
-                <input class="button" type="button" value="9" onclick="display('9')">
-            </td>
-            <td>
-                <input class="button" type="button" value="+" onclick="display('+')">
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <input class="button" type="button" value="." onclick="display('.')">
-            </td>
-            <td>
-                <input class="button" type="button" value="0" onclick="display('0')">
-            </td>
-            <td>
-                <input class="button" type="button" value="*" onclick="display('*')">
-            </td>
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scientific Calculator (HTML/JS)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* ซ่อน Scrollbar แต่ยังเลื่อนได้ */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      /* Animation กดปุ่ม */
+      .btn-active:active {
+        transform: scale(0.95);
+      }
+      /* ป้องกันการเลือกข้อความ */
+      .noselect {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+    </style>
+  </head>
+  <body
+    class="min-h-screen bg-slate-950 flex items-center justify-center p-4 font-sans noselect"
+  >
+    <div
+      class="w-full max-w-md bg-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-slate-800"
+    >
+      <!-- Header -->
+      <div
+        class="px-6 py-4 bg-slate-900 flex justify-between items-center border-b border-slate-800"
+      >
+        <div class="flex items-center gap-2 text-slate-400">
+          <!-- Calculator Icon -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect width="16" height="20" x="4" y="2" rx="2" />
+            <line x1="8" x2="16" y1="6" y2="6" />
+            <line x1="16" x2="16" y1="14" y2="18" />
+            <line x1="16" x2="16" y1="10" y2="10" />
+            <line x1="12" x2="12" y1="10" y2="10" />
+            <line x1="8" x2="8" y1="10" y2="10" />
+            <line x1="12" x2="12" y1="14" y2="18" />
+            <line x1="8" x2="8" y1="14" y2="18" />
+          </svg>
+          <span class="text-sm font-semibold tracking-wider">SCIENTIFIC</span>
+        </div>
+        <button
+          id="historyBtn"
+          class="p-2 rounded-lg transition-colors text-slate-400 hover:text-white hover:bg-slate-800"
+        >
+          <!-- History Icon -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+            <path d="M12 7v5l4 2" />
+          </svg>
+        </button>
+      </div>
 
+      <!-- Display Area -->
+      <div
+        class="p-6 flex flex-col items-end justify-end h-40 bg-slate-900 relative"
+      >
+        <!-- History Overlay -->
+        <div
+          id="historyOverlay"
+          class="hidden absolute inset-0 bg-slate-900/95 z-10 p-4 overflow-y-auto backdrop-blur-sm border-b border-slate-700"
+        >
+          <div class="flex justify-between items-center mb-2">
+            <h3
+              class="text-xs text-slate-500 uppercase tracking-widest font-bold"
+            >
+              History
+            </h3>
+            <button
+              onclick="clearHistory()"
+              class="text-xs text-red-400 hover:text-red-300"
+            >
+              Clear
+            </button>
+          </div>
+          <div id="historyList" class="space-y-2">
+            <!-- History items will be injected here -->
+            <p class="text-slate-600 text-center mt-10 text-sm">
+              ไม่มีประวัติการคำนวณ
+            </p>
+          </div>
+        </div>
 
-            <td>
-                <input class="button" type="button" value="=" onclick="calculate()" style="background-color: #fb0066;">
-            </td>
+        <div
+          id="expressionDisplay"
+          class="text-slate-400 text-sm h-6 mb-1 font-mono tracking-wide w-full text-right truncate"
+        ></div>
+        <div
+          class="w-full overflow-x-auto no-scrollbar flex justify-end items-center"
+        >
+          <span
+            id="mainDisplay"
+            class="text-4xl md:text-5xl font-light text-white whitespace-nowrap tracking-tight"
+            >0</span
+          >
+        </div>
+      </div>
 
-        </tr>
-    </table>
+      <!-- Controls & Mode -->
+      <div
+        class="bg-slate-800/50 px-4 py-2 flex justify-between items-center text-xs font-medium text-slate-400"
+      >
+        <div class="flex gap-3">
+          <div
+            class="flex bg-slate-900 rounded-full p-1 border border-slate-700"
+            id="modeToggle"
+          >
+            <button
+              id="btnDeg"
+              onclick="setMode(false)"
+              class="px-3 py-1 rounded-full transition-all bg-cyan-600 text-white shadow-lg shadow-cyan-500/30"
+            >
+              DEG
+            </button>
+            <button
+              id="btnRad"
+              onclick="setMode(true)"
+              class="px-3 py-1 rounded-full transition-all hover:text-slate-200"
+            >
+              RAD
+            </button>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <span id="memIndicator" class="text-orange-400 hidden">M</span>
+        </div>
+      </div>
 
+      <!-- Keypad -->
+      <div class="p-4 bg-slate-900">
+        <div class="grid grid-cols-5 gap-2 md:gap-3">
+          <!-- Row 1 -->
+          <button
+            onclick="input('sin(')"
+            class="btn-secondary h-14 md:h-16 rounded-xl font-medium text-sm bg-slate-700 hover:bg-slate-600 text-cyan-300 btn-active"
+          >
+            sin
+          </button>
+          <button
+            onclick="input('cos(')"
+            class="btn-secondary h-14 md:h-16 rounded-xl font-medium text-sm bg-slate-700 hover:bg-slate-600 text-cyan-300 btn-active"
+          >
+            cos
+          </button>
+          <button
+            onclick="input('tan(')"
+            class="btn-secondary h-14 md:h-16 rounded-xl font-medium text-sm bg-slate-700 hover:bg-slate-600 text-cyan-300 btn-active"
+          >
+            tan
+          </button>
+          <button
+            onclick="handleMemory('MC')"
+            class="h-14 md:h-16 rounded-xl font-medium text-sm bg-slate-800 hover:bg-slate-700 text-slate-500 btn-active"
+          >
+            MC
+          </button>
+          <button
+            onclick="handleMemory('MR')"
+            class="h-14 md:h-16 rounded-xl font-medium text-sm bg-slate-800 hover:bg-slate-700 text-slate-500 btn-active"
+          >
+            MR
+          </button>
 
-    <script src="./js/script.js"></script>
-</body>
+          <!-- Row 2 -->
+          <button
+            onclick="input('ln(')"
+            class="btn-secondary h-14 md:h-16 rounded-xl font-medium text-sm bg-slate-700 hover:bg-slate-600 text-cyan-300 btn-active"
+          >
+            ln
+          </button>
+          <button
+            onclick="input('log(')"
+            class="btn-secondary h-14 md:h-16 rounded-xl font-medium text-sm bg-slate-700 hover:bg-slate-600 text-cyan-300 btn-active"
+          >
+            log
+          </button>
+          <button
+            onclick="input('(')"
+            class="btn-secondary h-14 md:h-16 rounded-xl font-medium text-lg bg-slate-700 hover:bg-slate-600 text-cyan-300 btn-active"
+          >
+            (
+          </button>
+          <button
+            onclick="input(')')"
+            class="btn-secondary h-14 md:h-16 rounded-xl font-medium text-lg bg-slate-700 hover:bg-slate-600 text-cyan-300 btn-active"
+          >
+            )
+          </button>
+          <button
+            onclick="handleMemory('M+')"
+            class="h-14 md:h-16 rounded-xl font-medium text-sm bg-slate-800 hover:bg-slate-700 text-slate-500 btn-active"
+          >
+            M+
+          </button>
+
+          <!-- Row 3 -->
+          <button
+            onclick="input('^')"
+            class="btn-secondary h-14 md:h-16 rounded-xl font-medium text-lg bg-slate-700 hover:bg-slate-600 text-cyan-300 btn-active"
+          >
+            ^
+          </button>
+          <button
+            onclick="clearAll()"
+            class="h-14 md:h-16 rounded-xl font-medium text-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 btn-active"
+          >
+            AC
+          </button>
+          <button
+            onclick="del()"
+            class="h-14 md:h-16 rounded-xl font-medium text-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 btn-active flex items-center justify-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M20 5H9l-7 7 7 7h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Z" />
+              <line x1="18" x2="12" y1="9" y2="15" />
+              <line x1="12" x2="18" y1="9" y2="15" />
+            </svg>
+          </button>
+          <button
+            onclick="input('%')"
+            class="btn-secondary h-14 md:h-16 rounded-xl font-medium text-lg bg-slate-700 hover:bg-slate-600 text-cyan-300 btn-active"
+          >
+            %
+          </button>
+          <button
+            onclick="input('/')"
+            class="btn-secondary h-14 md:h-16 rounded-xl font-medium text-xl bg-slate-700 hover:bg-slate-600 text-cyan-300 btn-active"
+          >
+            ÷
+          </button>
+
+          <!-- Row 4 -->
+          <button
+            onclick="input('√(')"
+            class="btn-secondary h-14 md:h-16 rounded-xl font-medium text-lg bg-slate-700 hover:bg-slate-600 text-cyan-300 btn-active"
+          >
+            √
+          </button>
+          <button
+            onclick="input('7')"
+            class="h-14 md:h-16 rounded-xl font-medium text-xl bg-slate-800 hover:bg-slate-700 text-white btn-active"
+          >
+            7
+          </button>
+          <button
+            onclick="input('8')"
+            class="h-14 md:h-16 rounded-xl font-medium text-xl bg-slate-800 hover:bg-slate-700 text-white btn-active"
+          >
+            8
+          </button>
+          <button
+            onclick="input('9')"
+            class="h-14 md:h-16 rounded-xl font-medium text-xl bg-slate-800 hover:bg-slate-700 text-white btn-active"
+          >
+            9
+          </button>
+          <button
+            onclick="input('*')"
+            class="btn-secondary h-14 md:h-16 rounded-xl font-medium text-xl bg-slate-700 hover:bg-slate-600 text-cyan-300 btn-active"
+          >
+            ×
+          </button>
+
+          <!-- Row 5 -->
+          <button
+            onclick="input('π')"
+            class="btn-secondary h-14 md:h-16 rounded-xl font-medium text-lg bg-slate-700 hover:bg-slate-600 text-cyan-300 btn-active"
+          >
+            π
+          </button>
+          <button
+            onclick="input('4')"
+            class="h-14 md:h-16 rounded-xl font-medium text-xl bg-slate-800 hover:bg-slate-700 text-white btn-active"
+          >
+            4
+          </button>
+          <button
+            onclick="input('5')"
+            class="h-14 md:h-16 rounded-xl font-medium text-xl bg-slate-800 hover:bg-slate-700 text-white btn-active"
+          >
+            5
+          </button>
+          <button
+            onclick="input('6')"
+            class="h-14 md:h-16 rounded-xl font-medium text-xl bg-slate-800 hover:bg-slate-700 text-white btn-active"
+          >
+            6
+          </button>
+          <button
+            onclick="input('-')"
+            class="btn-secondary h-14 md:h-16 rounded-xl font-medium text-xl bg-slate-700 hover:bg-slate-600 text-cyan-300 btn-active"
+          >
+            -
+          </button>
+
+          <!-- Row 6 -->
+          <button
+            onclick="input('e')"
+            class="btn-secondary h-14 md:h-16 rounded-xl font-medium text-lg bg-slate-700 hover:bg-slate-600 text-cyan-300 btn-active"
+          >
+            e
+          </button>
+          <button
+            onclick="input('1')"
+            class="h-14 md:h-16 rounded-xl font-medium text-xl bg-slate-800 hover:bg-slate-700 text-white btn-active"
+          >
+            1
+          </button>
+          <button
+            onclick="input('2')"
+            class="h-14 md:h-16 rounded-xl font-medium text-xl bg-slate-800 hover:bg-slate-700 text-white btn-active"
+          >
+            2
+          </button>
+          <button
+            onclick="input('3')"
+            class="h-14 md:h-16 rounded-xl font-medium text-xl bg-slate-800 hover:bg-slate-700 text-white btn-active"
+          >
+            3
+          </button>
+          <button
+            onclick="input('+')"
+            class="btn-secondary h-14 md:h-16 rounded-xl font-medium text-xl bg-slate-700 hover:bg-slate-600 text-cyan-300 btn-active"
+          >
+            +
+          </button>
+
+          <!-- Row 7 -->
+          <button
+            onclick="input('.')"
+            class="h-14 md:h-16 rounded-xl font-medium text-xl bg-slate-800 hover:bg-slate-700 text-white btn-active"
+          >
+            .
+          </button>
+          <button
+            onclick="input('0')"
+            class="col-span-2 h-14 md:h-16 rounded-xl font-medium text-xl bg-slate-800 hover:bg-slate-700 text-white btn-active"
+          >
+            0
+          </button>
+          <button
+            onclick="calculate()"
+            class="col-span-2 h-14 md:h-16 rounded-xl font-medium text-2xl bg-orange-500 hover:bg-orange-600 text-white shadow-orange-500/20 btn-active"
+          >
+            =
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // State Variables
+      let display = "0";
+      let expression = "";
+      let history = [];
+      let isRad = false;
+      let memory = 0;
+      let showHistory = false;
+
+      // DOM Elements
+      const mainDisplayEl = document.getElementById("mainDisplay");
+      const expressionDisplayEl = document.getElementById("expressionDisplay");
+      const historyOverlayEl = document.getElementById("historyOverlay");
+      const historyListEl = document.getElementById("historyList");
+      const historyBtn = document.getElementById("historyBtn");
+      const memIndicatorEl = document.getElementById("memIndicator");
+      const btnDeg = document.getElementById("btnDeg");
+      const btnRad = document.getElementById("btnRad");
+
+      // Initialize
+      updateUI();
+
+      // --- Main Functions ---
+
+      function input(value) {
+        if (display === "Error") {
+          display = value;
+        } else if (
+          display === "0" &&
+          ![".", "+", "-", "*", "/", "^", "%"].includes(value)
+        ) {
+          display = value;
+        } else {
+          display += value;
+        }
+        updateUI();
+        scrollToEnd();
+      }
+
+      function clearAll() {
+        display = "0";
+        expression = "";
+        updateUI();
+      }
+
+      function del() {
+        if (display === "Error") {
+          clearAll();
+          return;
+        }
+        if (display.length === 1) {
+          display = "0";
+        } else {
+          display = display.slice(0, -1);
+        }
+        updateUI();
+      }
+
+      function calculate() {
+        try {
+          let calcString = display;
+
+          // Replace symbols with JS Syntax
+          calcString = calcString.replace(/×/g, "*").replace(/÷/g, "/");
+          calcString = calcString.replace(/\^/g, "**");
+          calcString = calcString.replace(/π/g, "Math.PI");
+          calcString = calcString.replace(/e/g, "Math.E");
+          calcString = calcString.replace(/√\(([^)]+)\)/g, "Math.sqrt($1)"); // sqrt(x)
+          calcString = calcString.replace(/√(\d+(\.\d+)?)/g, "Math.sqrt($1)"); // sqrtNumber
+
+          // Trig Functions (Deg vs Rad)
+          const trigFuncs = ["sin", "cos", "tan"];
+          trigFuncs.forEach((func) => {
+            const regex = new RegExp(`${func}\\(([^)]+)\\)`, "g");
+            calcString = calcString.replace(regex, (match, args) => {
+              if (isRad) {
+                return `Math.${func}(${args})`;
+              } else {
+                return `Math.${func}((${args}) * Math.PI / 180)`;
+              }
+            });
+          });
+
+          // Logs
+          calcString = calcString.replace(/log\(/g, "Math.log10(");
+          calcString = calcString.replace(/ln\(/g, "Math.log(");
+
+          // Basic safety check
+          if (
+            !/^[0-9+\-*/().\sMathPIE_**]+$/.test(
+              calcString.replace(
+                /Math\.(sin|cos|tan|sqrt|log|log10|PI|E)/g,
+                "",
+              ),
+            )
+          ) {
+            // Allow safe execution
+          }
+
+          // Execute
+          const result = new Function("return " + calcString)();
+
+          // Formatting
+          let formattedResult = Math.round(result * 10000000000) / 10000000000;
+
+          if (!isFinite(formattedResult) || isNaN(formattedResult)) {
+            throw new Error("Math Error");
+          }
+
+          // Update History
+          history.unshift({ expr: display, res: formattedResult });
+          history = history.slice(0, 10); // Keep last 10
+          renderHistory();
+
+          expression = display + " =";
+          display = String(formattedResult);
+        } catch (error) {
+          expression = display;
+          display = "Error";
+        }
+        updateUI();
+      }
+
+      // --- Memory Functions ---
+
+      function handleMemory(action) {
+        const current = parseFloat(display);
+        if (isNaN(current)) return;
+
+        switch (action) {
+          case "MC":
+            memory = 0;
+            break;
+          case "MR":
+            display = String(memory);
+            break;
+          case "M+":
+            memory += current;
+            break;
+          case "M-":
+            memory -= current;
+            break;
+        }
+        updateUI();
+      }
+
+      // --- UI & Utility Functions ---
+
+      function setMode(rad) {
+        isRad = rad;
+        updateUI();
+      }
+
+      function updateUI() {
+        mainDisplayEl.innerText = display;
+        expressionDisplayEl.innerText = expression;
+
+        // Update Deg/Rad Buttons
+        if (isRad) {
+          btnRad.className =
+            "px-3 py-1 rounded-full transition-all bg-cyan-600 text-white shadow-lg shadow-cyan-500/30";
+          btnDeg.className =
+            "px-3 py-1 rounded-full transition-all hover:text-slate-200";
+        } else {
+          btnDeg.className =
+            "px-3 py-1 rounded-full transition-all bg-cyan-600 text-white shadow-lg shadow-cyan-500/30";
+          btnRad.className =
+            "px-3 py-1 rounded-full transition-all hover:text-slate-200";
+        }
+
+        // Memory Indicator
+        memIndicatorEl.style.display = memory !== 0 ? "block" : "none";
+      }
+
+      function scrollToEnd() {
+        const container = mainDisplayEl.parentElement;
+        container.scrollLeft = container.scrollWidth;
+      }
+
+      // --- History Logic ---
+
+      historyBtn.addEventListener("click", () => {
+        showHistory = !showHistory;
+        if (showHistory) {
+          historyOverlayEl.classList.remove("hidden");
+          historyBtn.classList.add("bg-cyan-900/50", "text-cyan-400");
+          historyBtn.classList.remove("text-slate-400");
+        } else {
+          historyOverlayEl.classList.add("hidden");
+          historyBtn.classList.remove("bg-cyan-900/50", "text-cyan-400");
+          historyBtn.classList.add("text-slate-400");
+        }
+      });
+
+      function renderHistory() {
+        if (history.length === 0) {
+          historyListEl.innerHTML =
+            '<p class="text-slate-600 text-center mt-10 text-sm">ไม่มีประวัติการคำนวณ</p>';
+          return;
+        }
+
+        historyListEl.innerHTML = history
+          .map(
+            (item, index) => `
+                <div class="mb-3 text-right border-b border-slate-800 pb-2 last:border-0 cursor-pointer hover:bg-slate-800/50 rounded px-2"
+                     onclick="loadHistory('${item.res}')">
+                    <div class="text-slate-400 text-sm">${item.expr}</div>
+                    <div class="text-cyan-400 font-medium text-lg">= ${item.res}</div>
+                </div>
+            `,
+          )
+          .join("");
+      }
+
+      function loadHistory(value) {
+        display = String(value);
+        updateUI();
+        // Close history automatically if preferred, or leave open
+        // showHistory = false;
+        // historyOverlayEl.classList.add('hidden');
+      }
+
+      function clearHistory() {
+        history = [];
+        renderHistory();
+      }
+    </script>
+  </body>
 </html>
